@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1f3a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AeroPath">
+<title>AeroPath — Aerospace Study System</title>
+<link rel="manifest" id="manifest-holder">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgZmlsbD0iIzBiMWYzYSIvPjx0ZXh0IHg9IjkwIiB5PSIxMTUiIGZvbnQtc2l6ZT0iOTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMyRTc1QjYiIGZvbnQtZmFtaWx5PSJBcmlhbCI+8J+agDwvdGV4dD48L3N2Zz4=">
+<style>
+:root{--navy:#0b1f3a;--navy2:#12294d;--accent:#2E75B6;--accent2:#4a9fe0;--ok:#2ecc71;--bad:#e74c3c;--card:#16305a;--text:#eaf2fb;--muted:#9db6d6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:linear-gradient(160deg,#081627,#0b1f3a);color:var(--text);font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;min-height:100vh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+header{background:var(--navy);padding:16px;text-align:center;border-bottom:2px solid var(--accent);position:sticky;top:0;z-index:10}
+header h1{font-size:20px;letter-spacing:1px}.sub{color:var(--muted);font-size:12px;margin-top:4px}
+.wrap{max-width:820px;margin:0 auto;padding:16px}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.stat{flex:1;min-width:90px;background:var(--card);border-radius:12px;padding:12px;text-align:center;border:1px solid #24467a}
+.stat b{font-size:22px;color:var(--accent2);display:block}.stat span{font-size:11px;color:var(--muted)}
+.card{background:var(--card);border:1px solid #24467a;border-radius:16px;padding:18px;margin-bottom:14px}
+.slotrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.slot{flex:1;min-width:110px;padding:10px;border-radius:10px;background:var(--navy2);border:1px solid #24467a;font-size:12px;text-align:center;cursor:pointer}
+.slot.done{border-color:var(--ok);color:var(--ok)}.slot.active{border-color:var(--accent2);box-shadow:0 0 0 2px var(--accent)}
+.tier{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--accent2)}
+.qtext{font-size:17px;line-height:1.5;margin:10px 0 14px}
+.opt{display:block;width:100%;text-align:left;background:var(--navy2);border:1px solid #24467a;color:var(--text);padding:12px;border-radius:10px;margin-bottom:8px;cursor:pointer;font-size:15px}
+.opt:hover{border-color:var(--accent)}.opt.correct{border-color:var(--ok);background:#153c2a}.opt.wrong{border-color:var(--bad);background:#3c1a1a}
+input.num{width:100%;padding:12px;border-radius:10px;border:1px solid #24467a;background:var(--navy2);color:var(--text);font-size:16px}
+button.act{background:var(--accent);color:#fff;border:none;padding:12px 18px;border-radius:10px;font-size:15px;cursor:pointer;margin-top:10px}
+button.act:hover{background:var(--accent2)}
+.sol{margin-top:12px;padding:12px;background:var(--navy2);border-left:3px solid var(--accent2);border-radius:8px;font-size:14px;line-height:1.5;display:none}
+.guides{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.guide{background:var(--navy2);border:1px solid #24467a;border-radius:12px;padding:12px;font-size:13px;position:relative;overflow:hidden}
+.guide.locked{opacity:.45}.guide.current{border-color:var(--accent2);box-shadow:0 0 0 2px var(--accent)}
+.guide.mastered{border-color:var(--ok)}
+.bar{height:6px;background:#0a1c33;border-radius:4px;margin-top:8px;overflow:hidden}.bar>i{display:block;height:100%;background:var(--accent2);width:0%}
+.lockicon{position:absolute;top:10px;right:10px}
+#chatBubble{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.4);z-index:50}
+#chatPanel{position:fixed;right:16px;bottom:80px;width:min(360px,92vw);height:min(520px,70vh);background:var(--navy);border:1px solid var(--accent);border-radius:16px;display:none;flex-direction:column;z-index:50;overflow:hidden}
+#chatPanel header{position:static;font-size:14px;padding:12px;display:flex;justify-content:space-between;align-items:center}
+#chatLog{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.msg{padding:9px 12px;border-radius:12px;font-size:14px;line-height:1.4;max-width:85%}
+.msg.u{align-self:flex-end;background:var(--accent)}.msg.a{align-self:flex-start;background:var(--navy2);border:1px solid #24467a}
+#chatIn{display:flex;gap:6px;padding:10px;border-top:1px solid #24467a}
+#chatIn input{flex:1;padding:10px;border-radius:8px;border:1px solid #24467a;background:var(--navy2);color:var(--text)}
+.tabbar{display:flex;gap:8px;margin-bottom:14px}.tab{flex:1;padding:10px;text-align:center;border-radius:10px;background:var(--navy2);border:1px solid #24467a;cursor:pointer;font-size:13px}.tab.on{border-color:var(--accent2);color:var(--accent2)}
+.hidden{display:none}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:100}
+.celebrate{position:fixed;inset:0;background:rgba(8,22,39,.92);z-index:99;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px}
+.celebrate h2{font-size:34px;color:var(--accent2);margin-bottom:10px}.badge{font-size:70px;margin:14px}
+small.mut{color:var(--muted);font-size:12px}
+a{color:var(--accent2)}
+</style>
+</head>
+<body>
+<header><h1>🚀 AEROPATH</h1><div class="sub">2-Year Aerospace & Astrophysics Study System</div></header>
+<div class="wrap">
+  <div class="tabbar">
+    <div class="tab on" data-tab="today">Today</div>
+    <div class="tab" data-tab="guides">Guides</div>
+    <div class="tab" data-tab="settings">Settings</div>
+  </div>
+  <div class="stats">
+    <div class="stat"><b id="sStreak">0</b><span>Day Streak</span></div>
+    <div class="stat"><b id="sLevel">1</b><span>Level</span></div>
+    <div class="stat"><b id="sMastery">0%</b><span>Guide Mastery</span></div>
+    <div class="stat"><b id="sAnswered">0</b><span>Answered</span></div>
+  </div>
+
+  <div id="view-today">
+    <div class="card">
+      <div class="tier" id="guideLabel">Guide 1 · Math Foundations</div>
+      <div class="slotrow" id="slotRow"></div>
+      <div id="qArea"></div>
+    </div>
+  </div>
+
+  <div id="view-guides" class="hidden">
+    <div class="card"><div class="tier">Progression Path</div>
+      <p style="margin:8px 0;color:var(--muted);font-size:13px">Master each guide (≥90% score AND pass its final test &gt;90%) to unlock the next. No skipping.</p>
+      <div class="guides" id="guideGrid"></div>
+    </div>
+  </div>
+
+  <div id="view-settings" class="hidden">
+    <div class="card"><div class="tier">AI Tutor</div>
+      <p style="margin:8px 0;font-size:13px;color:var(--muted)">Optional: paste an Anthropic API key to enable live Claude chat. Leave blank to use built-in Socratic hints (always works offline). Stored only on this device.</p>
+      <input class="num" id="apiKey" placeholder="sk-ant-... (optional)" style="margin-bottom:8px">
+      <button class="act" onclick="saveKey()">Save Key</button>
+    </div>
+    <div class="card"><div class="tier">Data</div>
+      <p style="margin:8px 0;font-size:13px;color:var(--muted)">All progress lives on this device only. Export a backup file (recommended on iOS as a safety net).</p>
+      <button class="act" onclick="exportData()">Export Backup</button>
+      <button class="act" onclick="document.getElementById('imp').click()">Import</button>
+      <input type="file" id="imp" class="hidden" onchange="importData(event)">
+      <button class="act" style="background:#5a2530" onclick="if(confirm('Reset ALL progress?')){localStorage.removeItem('aeropath');location.reload()}">Reset</button>
+    </div>
+    <div class="card"><small class="mut">Install: iPhone → Share → Add to Home Screen. Desktop → install icon in address bar. Works fully offline after first load.</small></div>
+  </div>
+</div>
+
+<div id="chatBubble">💬</div>
+<div id="chatPanel">
+  <header>🎓 Aero Tutor <span style="cursor:pointer" onclick="toggleChat()">✕</span></header>
+  <div id="chatLog"><div class="msg a">Hi Luke! Stuck? Tell me what you're thinking and I'll nudge you toward it — I give hints before answers.</div></div>
+  <div id="chatIn"><input id="chatText" placeholder="Ask for a hint..." onkeydown="if(event.key==='Enter')sendChat()"><button class="act" style="margin:0" onclick="sendChat()">→</button></div>
+</div>
+
+<canvas id="confetti"></canvas>
+<div class="celebrate" id="celebrate">
+  <div class="badge">🏅</div><h2>GUIDE MASTERED!</h2>
+  <p id="celebText" style="color:var(--muted);margin-bottom:20px"></p>
+  <button class="act" onclick="closeCelebrate()">Continue →</button>
+</div>
+
+<script>
+/* ================= CONFIG ================= */
+const MODEL="claude-sonnet-4-6";           // swap here if environment pins a different snapshot
+const MASTERY_GATE=90, TEST_GATE=90, G0=9.80665;
+const TUTOR_SYSTEM=`You are the AeroPath tutor — a patient, encouraging tutor for math, physics, astrophysics, and aerospace engineering, helping Luke (a student heading to Northeastern for mechanical/aerospace engineering). Teach; do not just give answers. Follow Socratic method: ask a guiding question or give ONE small hint first. Only give the full worked solution if the student explicitly asks for the answer or is clearly stuck after 2-3 exchanges. Understand WHY before HOW. Keep replies short (2-4 sentences).`;
+
+/* ============ QUESTION BANK (seed — replace with JSON from Luke's 13 guides) ============
+   Schema per item: {tier:'easy|medium|hard', topic, type:'mc|numeric|short',
+   q, options?[], answer, tol?, solution, hints:[..]}   */
+const GUIDES=[
+ "Math Foundations","Calculus","Physics","Computing & CAD","Statics & Materials",
+ "Thermodynamics & Fluids","Orbital Mechanics","Control Theory","Propulsion",
+ "Relativity","Astrophysics","Cosmology"];
+
+const QUESTION_BANK={
+ 0:[ // Math Foundations
+  {tier:'easy',topic:'Algebra',type:'numeric',q:'Solve for x: 3x + 7 = 22.',answer:5,tol:0.01,solution:'3x=15 → x=5.',hints:['Isolate the term with x first.','Subtract 7 from both sides, then divide by 3.']},
+  {tier:'medium',topic:'Trig',type:'numeric',q:'A right triangle has legs 3 and 4. What is the hypotenuse?',answer:5,tol:0.01,solution:'√(3²+4²)=√25=5 (Pythagoras).',hints:['Pythagorean theorem.','c²=a²+b².']},
+  {tier:'hard',topic:'Vectors',type:'numeric',q:'Magnitude of vector (6, 8)?',answer:10,tol:0.01,solution:'√(6²+8²)=√100=10.',hints:['Magnitude = √(x²+y²).','Same as a 6-8-10 triangle.']},
+ ],
+ 4:[ // Statics & Materials (verified)
+  {tier:'easy',topic:'Axial Stress',type:'numeric',q:'A rod of diameter 20 mm carries an axial load of 10,000 N. Find the stress in MPa. (σ=F/A)',answer:31.8,tol:0.4,solution:'A=π(0.01)²=3.14e-4 m²; σ=10000/3.14e-4≈3.18e7 Pa=31.8 MPa.',hints:['Area of a circle uses the RADIUS (10 mm), not the diameter.','σ = F / (π r²).']},
+  {tier:'medium',topic:'Equilibrium',type:'numeric',q:'A 4 m simply-supported beam has a 200 N load 1 m from support A. Find reaction R_A (N). (ΣM=0)',answer:150,tol:1,solution:'Moments about A: R_B·4=200·1→R_B=50; R_A=200−50=150 N.',hints:['Take moments about one support to eliminate the other reaction.','ΣM_A=0 then ΣF=0.']},
+  {tier:'hard',topic:'Bending',type:'numeric',q:'Rectangular beam b=50 mm, h=100 mm, bending moment M=5000 N·m. Max bending stress in MPa? (σ=Mc/I, I=bh³/12)',answer:60,tol:0.5,solution:'I=0.05·0.1³/12=4.17e-6 m⁴; c=0.05; σ=5000·0.05/4.17e-6=6.0e7 Pa=60 MPa.',hints:['c is half the height.','I=bh³/12 for a rectangle.']},
+ ],
+ 5:[ // Thermodynamics & Fluids (verified)
+  {tier:'easy',topic:'Ideal Gas',type:'numeric',q:'2 mol of gas at 300 K in 0.05 m³. Find P in kPa. (PV=nRT, R=8.314)',answer:99.8,tol:0.3,solution:'P=nRT/V=2·8.314·300/0.05≈99,800 Pa=99.8 kPa.',hints:['Rearrange PV=nRT for P.','Watch units: answer in Pa then /1000.']},
+  {tier:'medium',topic:'First Law',type:'numeric',q:'500 J of heat added to a gas that does 200 J of work. Change in internal energy (J)? (ΔU=Q−W)',answer:300,tol:1,solution:'ΔU=Q−W=500−200=300 J.',hints:['W is work done BY the gas.','Subtract, don’t add.']},
+  {tier:'hard',topic:'Carnot',type:'numeric',q:'Carnot engine between 500 K and 300 K. Max efficiency (as decimal)? (η=1−Tc/Th)',answer:0.40,tol:0.005,solution:'η=1−300/500=0.40.',hints:['Temperatures must be in Kelvin.','η=1−Tc/Th.']},
+ ],
+ 6:[ // Orbital Mechanics (verified)
+  {tier:'medium',topic:'Vis-viva',type:'short',q:'In v²=μ(2/r − 1/a), what does a represent?',answer:'semi-major axis',solution:'a is the semi-major axis of the orbit; for a circle a=r.',hints:['It defines orbit size/energy.','For a circular orbit it equals the radius.']},
+  {tier:'hard',topic:'Hohmann',type:'numeric',q:'Approx total Δv (km/s) for a Hohmann transfer LEO(250km)→GEO? (Σ of two burns)',answer:3.9,tol:0.2,solution:'Δv1≈2.42 + Δv2≈1.47 ≈ 3.9 km/s.',hints:['Two tangential burns: periapsis then apoapsis.','Use vis-viva at each end of the transfer ellipse.']},
+ ],
+ 7:[ // Control Theory (verified)
+  {tier:'medium',topic:'2nd-order',type:'numeric',q:'For s²+4s+16, find the natural frequency ωn (rad/s). (compare to s²+2ζωn s+ωn²)',answer:4,tol:0.05,solution:'ωn²=16→ωn=4 rad/s.',hints:['ωn²is the constant term.','Take the square root of 16.']},
+  {tier:'hard',topic:'Damping',type:'numeric',q:'For s²+4s+16 (ωn=4), find the damping ratio ζ.',answer:0.5,tol:0.05,solution:'2ζωn=4→ζ=4/(2·4)=0.5 (underdamped).',hints:['Match the s-coefficient: 2ζωn.','Solve 2ζ·4=4.']},
+ ],
+ 8:[ // Propulsion (verified)
+  {tier:'easy',topic:'Isp',type:'numeric',q:'Engine Isp=300 s. Effective exhaust velocity vₑ (m/s)? (vₑ=Isp·g₀, g₀=9.81)',answer:2942,tol:20,solution:'vₑ=300·9.80665≈2942 m/s.',hints:['Multiply by standard gravity.','g₀≈9.81 m/s².']},
+  {tier:'hard',topic:'Rocket Eq',type:'numeric',q:'Δv (m/s) for vₑ=3000 m/s, m₀=10000 kg, m_f=4000 kg? (Δv=vₑ·ln(m₀/m_f))',answer:2749,tol:20,solution:'Δv=3000·ln(2.5)=3000·0.9163≈2749 m/s.',hints:['Take the natural log of the mass ratio.','ln(10000/4000)=ln(2.5).']},
+ ],
+ 9:[ // Relativity (verified)
+  {tier:'easy',topic:'Lorentz',type:'numeric',q:'Lorentz factor γ at v=0.6c? (γ=1/√(1−v²/c²))',answer:1.25,tol:0.01,solution:'γ=1/√(1−0.36)=1/0.8=1.25.',hints:['Compute v²/c²=0.36 first.','γ=1/√(0.64).']},
+  {tier:'hard',topic:'Time Dilation',type:'numeric',q:'A ship travels at 0.8c; 10 yr pass onboard (proper time). Years on Earth? (Δt=γΔt₀)',answer:16.67,tol:0.1,solution:'γ=1/√(1−0.64)=1.667; Δt=1.667·10≈16.67 yr.',hints:['Find γ at 0.8c first (=1.667).','Multiply proper time by γ.']},
+ ],
+ 10:[ // Astrophysics (verified)
+  {tier:'medium',topic:'Escape Velocity',type:'numeric',q:'Earth escape velocity (km/s)? (v=√(2GM/R), M=5.97e24, R=6.371e6)',answer:11.2,tol:0.1,solution:'v=√(2·6.674e-11·5.97e24/6.371e6)≈1.12e4 m/s=11.2 km/s.',hints:['v=√(2GM/R).','Answer in m/s then /1000.']},
+  {tier:'hard',topic:'Stefan-Boltzmann',type:'short',q:'In L=4πR²σT⁴, doubling T changes L by what factor?',answer:'16',solution:'L∝T⁴, so ×2 on T → 2⁴=16× on L.',hints:['Luminosity depends on the FOURTH power of T.','2⁴.']},
+ ],
+ 11:[ // Cosmology (verified)
+  {tier:'easy',topic:'Hubble Law',type:'numeric',q:'Recession velocity (km/s) of a galaxy 100 Mpc away? (v=H₀d, H₀=70)',answer:7000,tol:50,solution:'v=70·100=7000 km/s.',hints:['v=H₀·d.','H₀=70 km/s/Mpc here.']},
+  {tier:'hard',topic:'Schwarzschild',type:'numeric',q:'Schwarzschild radius of the Sun (km)? (r=2GM/c², M=1.989e30)',answer:2.95,tol:0.05,solution:'r=2·6.674e-11·1.989e30/(3e8)²≈2950 m≈2.95 km.',hints:['r_s=2GM/c².','Answer in m then /1000.']},
+ ]
+ /* Guides 1(Calc),2(Physics),3(Computing/CAD) plus more items per guide come from Luke's HTML. */
+};
+
+// final tests per guide (seed): pull items tagged for the exam; here we reuse guide items as a demo
+const FINAL_TEST_SIZE=5;
+
+/* ================= STATE ================= */
+const DEFAULT={streak:0,longest:0,lastActive:null,answered:0,correct:0,currentGuide:0,
+  day:1,slotsDone:[],guides:GUIDES.map(()=>({score:0,answered:0,correct:0,passed:false})),apiKey:''};
+let S=load();
+function load(){try{return Object.assign({},DEFAULT,JSON.parse(localStorage.getItem('aeropath'))||{})}catch(e){return {...DEFAULT}}}
+function save(){localStorage.setItem('aeropath',JSON.stringify(S))}
+
+/* durable storage on iOS */
+if(navigator.storage&&navigator.storage.persist){navigator.storage.persist().then(g=>console.log('persisted:',g))}
+
+/* ============ DAILY SELECTION ============ */
+const SLOTS=[{k:'Morning',tier:'easy'},{k:'Afternoon',tier:'medium'},{k:'Mid-afternoon',tier:'medium'},{k:'Evening',tier:'hard'},{k:'Evening 2',tier:'hard'}];
+let daySet=[],activeSlot=0;
+function buildDay(){
+  const g=S.currentGuide, bank=QUESTION_BANK[g]||[];
+  const byTier=t=>bank.filter(q=>q.tier===t);
+  const pick=(t,n)=>{let p=byTier(t);if(!p.length)p=bank;let out=[];for(let i=0;i<n;i++)out.push(p[(S.day+i)%p.length]);return out};
+  daySet=[...pick('easy',1),...pick('medium',2),...pick('hard',2)];
+  if(!S.slotsDone)S.slotsDone=[];
+}
+
+/* ============ RENDER ============ */
+function renderStats(){
+  sStreak.textContent=S.streak;sLevel.textContent=S.currentGuide+1;
+  sMastery.textContent=Math.round(S.guides[S.currentGuide].score)+'%';
+  sAnswered.textContent=S.answered;
+}
+function renderSlots(){
+  slotRow.innerHTML='';guideLabel.textContent=`Guide ${S.currentGuide+1} · ${GUIDES[S.currentGuide]}`;
+  SLOTS.forEach((s,i)=>{const d=document.createElement('div');
+    d.className='slot'+(S.slotsDone.includes(i)?' done':'')+(i===activeSlot?' active':'');
+    d.innerHTML=`<div class="tier">${s.k}</div><div>${SLOTS[i].tier}</div>`;
+    d.onclick=()=>{activeSlot=i;renderSlots();renderQ()};slotRow.appendChild(d)})
+}
+function renderQ(){
+  const q=daySet[activeSlot];if(!q){qArea.innerHTML='<p>All slots complete for today. 🎉 Come back tomorrow to keep your streak!</p>';return}
+  let h=`<div class="tier">${SLOTS[activeSlot].k} · ${q.topic} · ${q.tier}</div><div class="qtext">${q.q}</div>`;
+  if(q.type==='mc'){h+='<div id="opts">'+q.options.map((o,i)=>`<button class="opt" onclick="answerMC(${i})">${o}</button>`).join('')+'</div>'}
+  else{h+=`<input class="num" id="ansIn" placeholder="Your answer"><button class="act" onclick="answerText()">Submit</button>`}
+  h+=`<div class="sol" id="sol"></div>`;qArea.innerHTML=h;
+}
+function grade(q,val){
+  if(q.type==='numeric'){const u=parseFloat(val);if(isNaN(u))return false;const tol=Math.max(q.tol||0,0.01*Math.abs(q.answer));return Math.abs(u-q.answer)<=tol}
+  return (''+val).trim().toLowerCase()===(''+q.answer).trim().toLowerCase()||(''+val).toLowerCase().includes((''+q.answer).toLowerCase());
+}
+function record(correct){
+  const g=S.guides[S.currentGuide];g.answered++;S.answered++;if(correct){g.correct++;S.correct++}
+  g.score=g.answered?Math.round(100*g.correct/g.answered):0;
+  if(!S.slotsDone.includes(activeSlot))S.slotsDone.push(activeSlot);
+  bumpStreak();save();renderStats();renderSlots();maybeAdvance();
+}
+function answerMC(i){const q=daySet[activeSlot];const ok=(''+q.options[i])===(''+q.answer)||q.options[i]===q.answer||i===q.answer;
+  document.querySelectorAll('.opt').forEach((b,j)=>{if((''+q.options[j])===(''+q.answer))b.classList.add('correct');if(j===i&&!ok)b.classList.add('wrong')});
+  showSol(q);record(ok)}
+function answerText(){const q=daySet[activeSlot];const ok=grade(q,ansIn.value);showSol(q,ok);record(ok)}
+function showSol(q,ok){const s=document.getElementById('sol');s.style.display='block';
+  s.innerHTML=(ok===false?'❌ Not quite. ':(ok===true?'✅ Correct! ':''))+'<b>Solution:</b> '+q.solution}
+function bumpStreak(){const today=new Date().toDateString();
+  if(S.lastActive===today)return;const y=new Date(Date.now()-864e5).toDateString();
+  S.streak=(S.lastActive===y)?S.streak+1:1;S.lastActive=today;if(S.streak>S.longest)S.longest=S.streak}
+
+/* ============ ADVANCEMENT / LEVEL UP ============ */
+function maybeAdvance(){
+  const g=S.guides[S.currentGuide];
+  if(g.score>=MASTERY_GATE && g.answered>=8 && !g.passed){
+    // offer final test
+    if(confirm(`You've hit ${g.score}% mastery on ${GUIDES[S.currentGuide]}! Take the final test now to level up? (need >${TEST_GATE}%)`)) runFinalTest();
+  }
+}
+function runFinalTest(){
+  const bank=QUESTION_BANK[S.currentGuide]||[];let correct=0,total=Math.min(FINAL_TEST_SIZE,bank.length);
+  for(let i=0;i<total;i++){const q=bank[i];const a=prompt(`FINAL TEST ${i+1}/${total} (${q.topic}):\n${q.q}`);
+    if(a!==null&&grade(q,a))correct++}
+  const pct=Math.round(100*correct/total);
+  if(pct>TEST_GATE){S.guides[S.currentGuide].passed=true;celebrate(GUIDES[S.currentGuide],pct);
+    if(S.currentGuide<GUIDES.length-1){S.currentGuide++;S.day=1;S.slotsDone=[];activeSlot=0;buildDay()}
+    save();renderAll()}
+  else alert(`Scored ${pct}%. Need >${TEST_GATE}% to level up. Keep practicing — you've got this!`)
+}
+function celebrate(name,pct){celebText.textContent=`${name} passed at ${pct}%. Next guide unlocked!`;
+  celebrate_el.style.display='flex';fireConfetti()}
+const celebrate_el=document.getElementById('celebrate');
+function closeCelebrate(){celebrate_el.style.display='none'}
+/* confetti */
+const cv=document.getElementById('confetti');let cx=cv.getContext('2d'),parts=[];
+function fireConfetti(){cv.width=innerWidth;cv.height=innerHeight;parts=[];
+  for(let i=0;i<160;i++)parts.push({x:Math.random()*cv.width,y:-20,vx:(Math.random()-.5)*6,vy:Math.random()*4+2,c:['#2E75B6','#4a9fe0','#2ecc71','#fff'][i%4],s:Math.random()*6+3});
+  let t=0;(function anim(){cx.clearRect(0,0,cv.width,cv.height);parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.05;cx.fillStyle=p.c;cx.fillRect(p.x,p.y,p.s,p.s)});t++;if(t<160)requestAnimationFrame(anim);else cx.clearRect(0,0,cv.width,cv.height)})()}
+
+/* ============ GUIDES VIEW ============ */
+function renderGuides(){guideGrid.innerHTML='';GUIDES.forEach((g,i)=>{
+  const st=S.guides[i];const locked=i>S.currentGuide;const cur=i===S.currentGuide;
+  const d=document.createElement('div');
+  d.className='guide'+(locked?' locked':'')+(cur?' current':'')+(st.passed?' mastered':'');
+  d.innerHTML=`<b>Lvl ${i+1}</b><div>${g}</div>${locked?'<span class="lockicon">🔒</span>':st.passed?'<span class="lockicon">✅</span>':''}
+    <div class="bar"><i style="width:${st.score}%"></i></div><small class="mut">${st.score}% mastery</small>`;
+  guideGrid.appendChild(d)})}
+
+/* ============ TABS ============ */
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');
+  ['today','guides','settings'].forEach(v=>document.getElementById('view-'+v).classList.add('hidden'));
+  document.getElementById('view-'+t.dataset.tab).classList.remove('hidden');
+  if(t.dataset.tab==='guides')renderGuides()});
+
+/* ============ TUTOR CHAT ============ */
+const bubble=document.getElementById('chatBubble'),panel=document.getElementById('chatPanel');
+bubble.onclick=toggleChat;function toggleChat(){panel.style.display=panel.style.display==='flex'?'none':'flex'}
+function addMsg(t,who){const m=document.createElement('div');m.className='msg '+who;m.textContent=t;chatLog.appendChild(m);chatLog.scrollTop=chatLog.scrollHeight}
+let hintIdx=0;
+async function sendChat(){
+  const txt=chatText.value.trim();if(!txt)return;addMsg(txt,'u');chatText.value='';
+  const q=daySet[activeSlot];
+  const ctx=q?`Current question (Guide: ${GUIDES[S.currentGuide]}, topic: ${q.topic}, difficulty: ${q.tier}): "${q.q}". Correct answer (do NOT reveal unless asked): ${q.answer}.`:'No active question.';
+  if(S.apiKey){
+    addMsg('…thinking…','a');
+    try{
+      const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+        headers:{'x-api-key':S.apiKey,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({model:MODEL,max_tokens:400,system:TUTOR_SYSTEM+'\n\n'+ctx,messages:[{role:'user',content:txt}]})});
+      const d=await r.json();chatLog.lastChild.remove();
+      addMsg(d.content&&d.content[0]?d.content[0].text:'(no response — check API key)','a');
+    }catch(e){chatLog.lastChild.remove();offlineHint(q)}
+  } else offlineHint(q);
+}
+function offlineHint(q){
+  if(!q){addMsg("Open a question and I'll give you a hint tailored to it.",'a');return}
+  if(hintIdx<q.hints.length){addMsg('💡 Hint: '+q.hints[hintIdx],'a');hintIdx++}
+  else addMsg('Approach: '+q.solution.split('.')[0]+'. Try the arithmetic now — you\\'re close!','a');
+}
+// reset hint ladder when slot changes
+const _renderQ=renderQ;renderQ=function(){hintIdx=0;_renderQ()};
+
+/* ============ DATA ============ */
+function saveKey(){S.apiKey=apiKey.value.trim();save();alert('Saved on this device.')}
+function exportData(){const b=new Blob([JSON.stringify(S)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='aeropath-backup.json';a.click()}
+function importData(e){const f=e.target.files[0];const r=new FileReader();r.onload=()=>{try{S=Object.assign({},DEFAULT,JSON.parse(r.result));save();location.reload()}catch(x){alert('Bad file')}};r.readAsText(f)}
+
+/* ============ MANIFEST + SERVICE WORKER (single-file via Blob) ============ */
+const ICON='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzBiMWYzYSIvPjx0ZXh0IHg9IjI1NiIgeT0iMzMwIiBmb250LXNpemU9IjI2MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzJFNzVCNiI+8J+agDwvdGV4dD48L3N2Zz4=';
+const manifest={name:'AeroPath Aerospace Study',short_name:'AeroPath',start_url:'.',display:'standalone',
+  background_color:'#0b1f3a',theme_color:'#0b1f3a',
+  icons:[{src:ICON,sizes:'192x192',type:'image/svg+xml',purpose:'any'},
+         {src:ICON,sizes:'512x512',type:'image/svg+xml',purpose:'any'},
+         {src:ICON,sizes:'512x512',type:'image/svg+xml',purpose:'maskable'}]};
+document.getElementById('manifest-holder').href=URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:'application/json'}));
+
+if('serviceWorker' in navigator){
+  const swCode=`
+    const C='aeropath-v1';
+    self.addEventListener('install',e=>{self.skipWaiting()});
+    self.addEventListener('activate',e=>{e.waitUntil(self.clients.claim())});
+    self.addEventListener('fetch',e=>{
+      const u=e.request.url;
+      if(u.includes('api.anthropic.com'))return;           // never cache tutor calls
+      e.respondWith(caches.open(C).then(async c=>{
+        const hit=await c.match(e.request);
+        if(hit)return hit;
+        try{const res=await fetch(e.request);if(e.request.method==='GET'&&res.ok)c.put(e.request,res.clone());return res}
+        catch(err){return hit||new Response('offline',{status:503})}
+      }));
+    });`;
+  const swURL=URL.createObjectURL(new Blob([swCode],{type:'text/javascript'}));
+  navigator.serviceWorker.register(swURL).catch(e=>console.log('SW:',e));
+  // cache the shell (this document) on first load
+  window.addEventListener('load',()=>{if(caches)caches.open('aeropath-v1').then(c=>c.add(location.href).catch(()=>{}))});
+}
+
+/* ============ BOOT ============ */
+function renderAll(){buildDay();renderStats();renderSlots();renderQ();apiKey.value=S.apiKey||''}
+buildDay();if(!S.slotsDone)S.slotsDone=[];renderAll();
+</script>
+</body>
+</html>
